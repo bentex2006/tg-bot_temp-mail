@@ -205,9 +205,9 @@ export default function Home() {
                 <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-6">
                   <MessageSquareLock className="text-white h-6 w-6" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-4">MessageSquareLock Integration</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-4">Telegram Integration</h3>
                 <p className="text-slate-600">
-                  Receive all emails directly in your MessageSquareLock chat. No app switching, no notifications chaos.
+                  Receive all emails directly in your Telegram chat. No app switching, no notifications chaos.
                 </p>
               </CardContent>
             </Card>
@@ -243,7 +243,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-4">No Passwords</h3>
                 <p className="text-slate-600">
-                  Authenticate using only your MessageSquareLock account. Secure, simple, and hassle-free.
+                  Authenticate using only your Telegram account. Secure, simple, and hassle-free.
                 </p>
               </CardContent>
             </Card>
@@ -267,7 +267,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-4">Instant Setup</h3>
                 <p className="text-slate-600">
-                  Get started in minutes. Register, connect MessageSquareLock, and start receiving emails immediately.
+                  Get started in minutes. Register, connect Telegram, and start receiving emails immediately.
                 </p>
               </CardContent>
             </Card>

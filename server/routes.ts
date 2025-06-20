@@ -243,6 +243,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Telegram bot
   telegramBot.initialize(storage);
 
+  // Seed initial domains
+  const seedDomains = async () => {
+    try {
+      const existingDomains = await storage.getAllDomains();
+      if (existingDomains.length === 0) {
+        // Seed default domains
+        await storage.createDomain({ domain: 'kalanaagpur.com', isPremium: false });
+        await storage.createDomain({ domain: 'b3xmail.com', isPremium: false });
+        await storage.createDomain({ domain: 'premium.b3x.io', isPremium: true });
+        await storage.createDomain({ domain: 'vip.kalanaagpur.com', isPremium: true });
+        console.log("Seeded initial domains");
+      }
+    } catch (error) {
+      console.error("Domain seeding error:", error);
+    }
+  };
+
+  // Run initial setup
+  seedDomains();
+
   // Cleanup expired emails every hour
   setInterval(async () => {
     try {

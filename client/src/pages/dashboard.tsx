@@ -60,11 +60,20 @@ interface EmailData {
   };
 }
 
+interface Domain {
+  id: number;
+  domain: string;
+  isPremium: boolean;
+  isActive: boolean;
+  createdAt: string;
+}
+
 export default function Dashboard() {
   const [telegramId, setTelegramId] = useState<string>("");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [emailType, setEmailType] = useState<'permanent' | 'temporary'>('temporary');
   const [customPrefix, setCustomPrefix] = useState("");
+  const [selectedDomain, setSelectedDomain] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -92,8 +101,13 @@ export default function Dashboard() {
     enabled: !!telegramId,
   });
 
+  const { data: domainsData } = useQuery<{ domains: Domain[] }>({
+    queryKey: ['/api/domains', telegramId],
+    enabled: !!telegramId,
+  });
+
   const createEmailMutation = useMutation({
-    mutationFn: async (data: { telegramId: string; type: string; customPrefix?: string }) => {
+    mutationFn: async (data: { telegramId: string; type: string; customPrefix?: string; domain: string }) => {
       const response = await apiRequest("POST", "/api/emails", data);
       return response.json();
     },
@@ -101,6 +115,7 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ['/api/emails', telegramId] });
       setShowCreateDialog(false);
       setCustomPrefix("");
+      setSelectedDomain("");
       toast({
         title: "Email Created",
         description: "Your new email address has been created successfully!",
@@ -137,10 +152,20 @@ export default function Dashboard() {
   });
 
   const handleCreateEmail = () => {
+    if (!selectedDomain) {
+      toast({
+        title: "Domain Required",
+        description: "Please select a domain for your email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     createEmailMutation.mutate({
       telegramId,
       type: emailType,
       customPrefix: emailType === 'permanent' ? customPrefix : undefined,
+      domain: selectedDomain,
     });
   };
 
@@ -216,6 +241,12 @@ export default function Dashboard() {
   const emails = emailData?.emails || [];
   const usage = emailData?.usage || { tempEmailsCreated: 0, permanentEmailsCreated: 0 };
   const limits = emailData?.limits || { permanent: 2, temporary: 5 };
+  const domains = domainsData?.domains || [];
+
+  // Set default domain when domains load
+  if (domains.length > 0 && !selectedDomain) {
+    setSelectedDomain(domains[0].domain);
+  }
 
   const permanentEmails = emails.filter(e => e.type === 'permanent');
   const temporaryEmails = emails.filter(e => e.type === 'temporary');
@@ -230,7 +261,7 @@ export default function Dashboard() {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Mail className="text-white h-4 w-4" />
               </div>
-              <span className="font-bold text-xl text-slate-900">KalanaAgpur Mail</span>
+              <span className="font-bold text-xl text-slate-900">B3X Mail</span>
             </div>
             <div className="flex items-center space-x-4">
               <Badge variant={user.user.isPro ? "default" : "secondary"}>
