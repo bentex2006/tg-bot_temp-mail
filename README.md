@@ -1,6 +1,15 @@
-# B3X Mail - Temporary Email Service
-
-A modern, secure temporary email service that forwards emails directly to your Telegram account. Built with React, Node.js, PostgreSQL, and Cloudflare Workers.
+<div align="center">
+  <img src="attached_assets/Black and White  X Letter Digital Company Logo (1)_1750395530039.jpg" alt="B3X Logo" width="200" height="200">
+  
+  # B3X Mail - Temporary Email Service
+  
+  A modern, secure temporary email service that forwards emails directly to your Telegram account. Built with React, Node.js, PostgreSQL, and Cloudflare Workers.
+  
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)
+  [![React](https://img.shields.io/badge/React-18+-blue.svg)](https://reactjs.org/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue.svg)](https://www.typescriptlang.org/)
+</div>
 
 ## 🚀 Features
 
@@ -217,4 +226,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Note**: Replace placeholder values (like `yourusername`, `your_telegram_bot_token_here`, etc.) with your actual values before deployment.
+<div align="center">
+  <img src="attached_assets/Black and White  X Letter Digital Company Logo (1)_1750395530039.jpg" alt="B3X Logo" width="100" height="100">
+  
+  **B3X Mail** - Secure temporary email service
+  
+  **Note**: Replace placeholder values (like `yourusername`, `your_telegram_bot_token_here`, etc.) with your actual values before deployment.
+</div>
