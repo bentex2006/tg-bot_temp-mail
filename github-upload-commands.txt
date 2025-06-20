@@ -24,10 +24,13 @@ Features:
 # Click "Create repository"
 
 # Step 3: Connect to your GitHub repository
-# Replace 'yourusername' with your actual GitHub username
-git remote add origin https://github.com/yourusername/b3x-mail.git
+# Replace 'YOUR_USERNAME' with your actual GitHub username
+git remote add origin https://github.com/YOUR_USERNAME/b3x-mail.git
 git branch -M main
 git push -u origin main
+
+# Example: if your GitHub username is 'johnsmith'
+# git remote add origin https://github.com/johnsmith/b3x-mail.git
 
 # Alternative: Use the upload script
 # chmod +x upload-to-github.sh
