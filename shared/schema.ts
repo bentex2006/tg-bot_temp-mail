@@ -96,6 +96,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   fullName: true,
   telegramUsername: true,
   telegramId: true,
+  registrationIp: true,
 });
 
 export const insertEmailSchema = createInsertSchema(emails).pick({

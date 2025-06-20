@@ -1,9 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertEmailSchema, insertDomainSchema } from "@shared/schema";
+import { insertUserSchema, insertEmailSchema, insertDomainSchema, users } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, sql } from "drizzle-orm";
 import { z } from "zod";
 import { telegramBot } from "./services/telegram-bot";
+import { emailHandler } from "./services/email-handler";
 
 const registrationSchema = insertUserSchema.extend({
   telegramUsername: z.string().min(1).transform(val => val.replace('@', '')),
@@ -74,7 +77,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid input data", errors: error.errors });
       }
-      if (error.message === "Username already exists") {
+      if (error instanceof Error && error.message === "Username already exists") {
         return res.status(400).json({ message: "Username already registered" });
       }
       res.status(500).json({ message: "Registration failed" });
@@ -264,6 +267,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Cleanup error:", error);
       res.status(500).json({ message: "Cleanup failed" });
+    }
+  });
+
+  // Email webhook endpoint for Cloudflare Email Routing
+  app.post("/api/webhook/email", async (req, res) => {
+    try {
+      const { to, from, subject, text, html } = req.body;
+      
+      // Process the incoming email
+      await emailHandler.processIncomingEmail({
+        to,
+        from,
+        subject,
+        body: text || html || '',
+      });
+      
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("Email webhook error:", error);
+      res.status(500).json({ error: "Failed to process email" });
     }
   });
 
