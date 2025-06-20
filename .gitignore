@@ -54,6 +54,8 @@ Thumbs.db
 # Replit specific
 .replit
 replit.nix
+.cache/
+.local/
 
 # Development
 .cache/

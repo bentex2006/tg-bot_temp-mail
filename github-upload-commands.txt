@@ -1,0 +1,34 @@
+# B3X Mail - GitHub Upload Commands
+# Copy and paste these commands in order
+
+# Step 1: Initialize and commit your project
+git init
+git add .
+git commit -m "Initial commit: B3X Mail - Temporary Email Service
+
+Features:
+- Temporary & permanent email addresses  
+- Telegram bot integration
+- Cloudflare Workers email routing
+- Anti-spam protection
+- PostgreSQL database
+- React + TypeScript frontend
+- Node.js + Express backend"
+
+# Step 2: Create repository on GitHub
+# Go to: https://github.com/new
+# Repository name: b3x-mail
+# Description: Modern temporary email service with Telegram integration
+# Set to Public
+# Don't initialize with README
+# Click "Create repository"
+
+# Step 3: Connect to your GitHub repository
+# Replace 'yourusername' with your actual GitHub username
+git remote add origin https://github.com/yourusername/b3x-mail.git
+git branch -M main
+git push -u origin main
+
+# Alternative: Use the upload script
+# chmod +x upload-to-github.sh
+# ./upload-to-github.sh
