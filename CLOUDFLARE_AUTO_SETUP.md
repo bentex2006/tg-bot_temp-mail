@@ -14,10 +14,10 @@ This setup will automatically handle all email routing through Cloudflare Worker
 3. **Update Configuration** in the worker code:
    ```javascript
    const CONFIG = {
-     SERVER_URL: 'https://your-repl-name.your-username.repl.co', // Your actual server
+     SERVER_URL: 'https://your-server-url.com', // Your actual server
      WEBHOOK_PATH: '/api/webhook/email',
      WEBHOOK_SECRET: 'your-secret-key-123', // Optional security
-     ALLOWED_DOMAINS: ['kalanaagpur.com'] // Add more domains here
+     ALLOWED_DOMAINS: ['yourdomain.com'] // Add more domains here
    };
    ```
 
@@ -28,21 +28,21 @@ This setup will automatically handle all email routing through Cloudflare Worker
 
 ## Step 2: DNS Setup (Same as before)
 
-Add these DNS records to `kalanaagpur.com`:
+Add these DNS records to `yourdomain.com`:
 
 ```
 MX  @  route1.mx.cloudflare.net  10
 MX  @  route2.mx.cloudflare.net  20  
 MX  @  route3.mx.cloudflare.net  30
 TXT @  "v=spf1 include:_spf.mx.cloudflare.net ~all"
-TXT _dmarc  "v=DMARC1; p=quarantine; rua=mailto:dmarc@kalanaagpur.com"
+TXT _dmarc  "v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com"
 ```
 
 ## Step 3: Email Routing Setup
 
 1. **Enable Email Routing**:
    - Cloudflare Dashboard → Email → Email Routing
-   - Enable for kalanaagpur.com
+   - Enable for yourdomain.com
 
 2. **Create Catch-All Rule**:
    - Go to Routing Rules
@@ -58,8 +58,8 @@ TXT _dmarc  "v=DMARC1; p=quarantine; rua=mailto:dmarc@kalanaagpur.com"
 
 2. **Send Test Email**:
    ```bash
-   # Send to any address @kalanaagpur.com
-   echo "Test message" | mail -s "Test Subject" test@kalanaagpur.com
+   # Send to any address @yourdomain.com
+   echo "Test message" | mail -s "Test Subject" test@yourdomain.com
    ```
 
 3. **Check Logs**:
@@ -97,7 +97,7 @@ const CONFIG = {
   WEBHOOK_SECRET: 'your-secret-key',
   
   // Domains to handle (add new domains here)
-  ALLOWED_DOMAINS: ['kalanaagpur.com', 'newdomain.com']
+  ALLOWED_DOMAINS: ['yourdomain.com', 'newdomain.com']
 };
 ```
 
@@ -105,7 +105,7 @@ const CONFIG = {
 
 1. **Add to worker config**:
    ```javascript
-   ALLOWED_DOMAINS: ['kalanaagpur.com', 'newdomain.com']
+   ALLOWED_DOMAINS: ['yourdomain.com', 'newdomain.com']
    ```
 
 2. **Deploy updated worker**
@@ -129,7 +129,7 @@ const CONFIG = {
 1. Check worker logs for errors
 2. Verify SERVER_URL is correct and accessible
 3. Test health endpoint: `/health`
-4. Check DNS propagation: `dig MX kalanaagpur.com`
+4. Check DNS propagation: `dig MX yourdomain.com`
 
 **Worker errors:**
 1. Check server is running and responding

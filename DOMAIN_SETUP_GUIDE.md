@@ -1,8 +1,8 @@
-# kalanaagpur.com Email Domain Setup Guide
+# Email Domain Setup Guide
 
 ## Step 1: Cloudflare DNS Configuration
 
-Login to your Cloudflare dashboard and go to DNS settings for kalanaagpur.com:
+Login to your Cloudflare dashboard and go to DNS settings for your domain:
 
 ### MX Records (Email Routing)
 ```
@@ -37,7 +37,7 @@ TTL: Auto
 ```
 Type: TXT
 Name: _dmarc
-Content: "v=DMARC1; p=quarantine; rua=mailto:dmarc@kalanaagpur.com; ruf=mailto:dmarc@kalanaagpur.com; fo=1"
+Content: "v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com; ruf=mailto:dmarc@yourdomain.com; fo=1"
 TTL: Auto
 ```
 
@@ -105,7 +105,7 @@ Replace `your-b3x-server.com` with your actual server URL:
 ## Step 5: Test Email Routing
 
 ### Quick Test
-1. Send an email to: `test@kalanaagpur.com`
+1. Send an email to: `test@yourdomain.com`
 2. Check your server logs for webhook calls
 3. Register a test user and create an email address
 4. Send email to that address and verify it appears in Telegram
@@ -113,19 +113,19 @@ Replace `your-b3x-server.com` with your actual server URL:
 ### Verification Commands
 ```bash
 # Check MX records
-dig MX kalanaagpur.com
+dig MX yourdomain.com
 
 # Check SPF record
-dig TXT kalanaagpur.com
+dig TXT yourdomain.com
 
 # Check DMARC record
-dig TXT _dmarc.kalanaagpur.com
+dig TXT _dmarc.yourdomain.com
 
 # Test email delivery
 curl -X POST https://your-server.com/api/webhook/email \
   -H "Content-Type: application/json" \
   -d '{
-    "to": "test@kalanaagpur.com",
+    "to": "test@yourdomain.com",
     "from": "sender@example.com", 
     "subject": "Test Email",
     "text": "This is a test message"
@@ -187,9 +187,9 @@ Bot will automatically:
 - [ ] HTTPS certificate valid
 - [ ] Server logs showing webhook calls
 
-Your kalanaagpur.com domain is now ready to handle emails for B3X Mail service!
+Your domain is now ready to handle emails for B3X Mail service!
 
 ## Support
-- Test with: `test@kalanaagpur.com`
-- Bot: @akimailb3xbot
-- Admin: @skittle_gg
+- Test with: `test@yourdomain.com`
+- Bot: @your_bot_username
+- Admin: @your_admin_username

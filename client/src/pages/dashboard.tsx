@@ -193,7 +193,7 @@ export default function Dashboard() {
                 Access Dashboard
               </Button>
               <p className="text-sm text-slate-500 text-center">
-                Don't know your ID? Message <a href="https://t.me/akimailb3xbot" className="underline" target="_blank" rel="noopener noreferrer">@akimailb3xbot</a> with /start
+                Don't know your ID? Message your configured bot with /start
               </p>
             </div>
           </CardContent>

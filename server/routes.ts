@@ -193,10 +193,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "User is banned" });
       }
 
-      // For now, only allow kalanaagpur.com
-      const allowedDomain = 'kalanaagpur.com';
-      if (domain !== allowedDomain) {
-        return res.status(403).json({ message: "Only kalanaagpur.com domain is available. Other domains coming soon!" });
+      // Check if domain is allowed (configure in database)
+      const availableDomains = await storage.getAvailableDomainsForUser(user.isPro);
+      const allowedDomain = availableDomains.find(d => d.domain === domain);
+      if (!allowedDomain) {
+        return res.status(403).json({ message: "Domain not available for your account type" });
       }
 
       // Check usage limits

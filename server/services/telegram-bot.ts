@@ -103,7 +103,7 @@ Get started now! 🎉`;
 
         // Get available domains for user
         const availableDomains = await this.storage.getAvailableDomainsForUser(user.isPro);
-        const defaultDomain = availableDomains[0]?.domain || 'kalanaagpur.com';
+        const defaultDomain = availableDomains[0]?.domain || 'yourdomain.com';
 
         // Generate temp email with random username
         const randomUsername = Math.random().toString(36).substring(2, 10);

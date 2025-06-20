@@ -5,9 +5,9 @@ This guide covers everything needed to deploy your B3X Mail service with anti-sp
 ## 🚀 Quick Setup Summary
 
 ### 1. Bot Configuration
-- **Bot Username**: @akimailb3xbot
-- **Bot Token**: 7577515733:AAE6ZYNtfSNZNvoNtdYD6Uz5TkCPHZmJpPA
-- **Domain**: kalanaagpur.com (configured for emails)
+- **Bot Username**: @your_bot_username (create with @BotFather)
+- **Bot Token**: Get from @BotFather on Telegram
+- **Domain**: yourdomain.com (configure for emails)
 
 ### 2. Security Features Implemented
 - ✅ IP-based rate limiting (max 3 registrations per hour per IP)
@@ -22,7 +22,7 @@ This guide covers everything needed to deploy your B3X Mail service with anti-sp
 ### 3. Current Features
 - **Free Plan**: 2 permanent emails + 5 temporary emails/day
 - **PRO Plan**: 20 permanent emails + unlimited temporary emails
-- **Domain**: kalanaagpur.com only (others "coming soon")
+- **Domain**: Single domain support (easily expandable)
 - **Telegram Integration**: Full bot management with admin commands
 
 ## 📧 Email Domain Setup (Cloudflare)
@@ -47,12 +47,12 @@ Content: "v=spf1 ip4:YOUR_SERVER_IP ~all"
 
 Type: TXT
 Name: _dmarc
-Content: "v=DMARC1; p=quarantine; rua=mailto:dmarc@kalanaagpur.com"
+Content: "v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com"
 ```
 
 ### Step 2: Cloudflare Email Routing
 1. Go to Cloudflare Dashboard → Email → Email Routing
-2. Enable Email Routing for kalanaagpur.com
+2. Enable Email Routing for yourdomain.com
 3. Add catch-all rule:
    - Match: All emails
    - Action: Send to webhook
@@ -74,7 +74,7 @@ The webhook endpoint `/api/webhook/email` is already implemented and will:
 - `/usage` - Check usage statistics
 - `/help` - Command help
 
-### Admin Commands (for @skittle_gg)
+### Admin Commands (configure admin username in .env)
 - `/userp @username` - Promote user to PRO
 - `/userinfo @username` - Get user statistics
 - `/ban @username` - Ban user account
@@ -116,8 +116,9 @@ Set these in your deployment:
 
 ```bash
 DATABASE_URL=your_postgres_connection_string
-BOT_TOKEN=7577515733:AAE6ZYNtfSNZNvoNtdYD6Uz5TkCPHZmJpPA
+BOT_TOKEN=your_telegram_bot_token
 ENCRYPTION_KEY=your-32-character-encryption-key
+ADMIN_USERNAME=your_telegram_username
 NODE_ENV=production
 ```
 
@@ -132,7 +133,7 @@ NODE_ENV=production
 ### Dashboard
 - Email management (create/delete)
 - Usage statistics display
-- Domain selection (kalanaagpur.com + "coming soon")
+- Domain selection (configured domain + expandable)
 - Account type indicator (Free/PRO)
 
 ## 🔧 Testing Your Setup
@@ -215,8 +216,8 @@ Monitor these metrics:
 
 ## Support & Contact
 
-- **Developer**: @skittle_gg
-- **Bot**: @akimailb3xbot
-- **Service**: B3X Mail powered by kalanaagpur.com
+- **Developer**: Configure your username
+- **Bot**: Configure your bot username  
+- **Service**: B3X Mail powered by your domain
 
 Your B3X Mail service is now production-ready with enterprise-grade security features!

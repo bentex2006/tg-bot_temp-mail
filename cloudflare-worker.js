@@ -6,7 +6,7 @@
 // Configuration - Update these with your actual values
 const CONFIG = {
   // Your B3X Mail server URL (update this)
-  SERVER_URL: 'https://your-repl-name.your-username.repl.co',
+  SERVER_URL: 'https://your-server-url.com',
   
   // Webhook endpoint
   WEBHOOK_PATH: '/api/webhook/email',
@@ -15,7 +15,7 @@ const CONFIG = {
   WEBHOOK_SECRET: 'your-webhook-secret-key',
   
   // Allowed domains for email forwarding
-  ALLOWED_DOMAINS: ['kalanaagpur.com']
+  ALLOWED_DOMAINS: ['yourdomain.com']
 };
 
 export default {
