@@ -58,6 +58,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    // Check for existing username (case-insensitive)
+    const existingByUsername = await db
+      .select()
+      .from(users)
+      .where(sql`LOWER(${users.telegramUsername}) = LOWER(${insertUser.telegramUsername})`);
+    
+    if (existingByUsername.length > 0) {
+      throw new Error("Username already exists");
+    }
+
     const [user] = await db
       .insert(users)
       .values(insertUser)

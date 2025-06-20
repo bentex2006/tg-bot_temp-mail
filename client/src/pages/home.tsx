@@ -307,7 +307,7 @@ export default function Home() {
                   </div>
                   <div className="flex items-center">
                     <CheckCircle className="text-emerald-500 mr-3 h-5 w-5" />
-                    <span>MessageSquareLock Bot Integration</span>
+                    <span>Anti-Spam Protection</span>
                   </div>
                   <div className="flex items-center">
                     <CheckCircle className="text-emerald-500 mr-3 h-5 w-5" />
@@ -343,7 +343,7 @@ export default function Home() {
                   </div>
                   <div className="flex items-center">
                     <CheckCircle className="text-emerald-500 mr-3 h-5 w-5" />
-                    <span>Priority MessageSquareLock Support</span>
+                    <span>Premium Domain Access</span>
                   </div>
                   <div className="flex items-center">
                     <CheckCircle className="text-emerald-500 mr-3 h-5 w-5" />

@@ -6,7 +6,7 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   fullName: text("full_name").notNull(),
-  telegramUsername: text("telegram_username").notNull(),
+  telegramUsername: text("telegram_username").notNull().unique(),
   telegramId: text("telegram_id").notNull().unique(),
   isPro: boolean("is_pro").default(false).notNull(),
   isActive: boolean("is_active").default(true).notNull(),
@@ -14,6 +14,8 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   verificationCode: varchar("verification_code", { length: 6 }),
   isVerified: boolean("is_verified").default(false).notNull(),
+  lastLoginAt: timestamp("last_login_at"),
+  registrationIp: text("registration_ip"),
 });
 
 export const emails = pgTable("emails", {

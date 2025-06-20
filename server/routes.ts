@@ -21,18 +21,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/register", async (req, res) => {
     try {
       const userData = registrationSchema.parse(req.body);
+      const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
       
-      // Check if user already exists
-      const existingUser = await storage.getUserByTelegramId(userData.telegramId);
-      if (existingUser) {
+      // Check if user already exists by Telegram ID
+      const existingUserById = await storage.getUserByTelegramId(userData.telegramId);
+      if (existingUserById) {
         return res.status(400).json({ message: "User with this Telegram ID already exists" });
+      }
+
+      // Check if username already exists (anti-multi-account)
+      const existingUserByUsername = await storage.getUserByTelegramUsername(userData.telegramUsername);
+      if (existingUserByUsername) {
+        return res.status(400).json({ message: "Username already registered" });
+      }
+
+      // Rate limiting: Check for recent registrations from same IP (anti-spam)
+      const recentRegistrations = await db
+        .select()
+        .from(users)
+        .where(and(
+          eq(users.registrationIp, clientIp),
+          sql`${users.createdAt} > NOW() - INTERVAL '1 hour'`
+        ));
+
+      if (recentRegistrations.length >= 3) {
+        return res.status(429).json({ 
+          message: "Too many registrations from this IP. Please try again later." 
+        });
       }
 
       // Generate verification code
       const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
       
-      // Create user
-      const user = await storage.createUser(userData);
+      // Create user with IP tracking
+      const userDataWithIp = {
+        ...userData,
+        registrationIp: clientIp
+      };
+      
+      const user = await storage.createUser(userDataWithIp);
       await storage.setUserVerificationCode(userData.telegramId, verificationCode);
 
       // Send verification code via Telegram
@@ -46,6 +73,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Registration error:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid input data", errors: error.errors });
+      }
+      if (error.message === "Username already exists") {
+        return res.status(400).json({ message: "Username already registered" });
       }
       res.status(500).json({ message: "Registration failed" });
     }
@@ -121,11 +151,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "User is banned" });
       }
 
-      // Validate domain access
-      const availableDomains = await storage.getAvailableDomainsForUser(user.isPro);
-      const selectedDomain = availableDomains.find(d => d.domain === domain);
-      if (!selectedDomain) {
-        return res.status(403).json({ message: "Domain not available for your account type" });
+      // For now, only allow kalanaagpur.com
+      const allowedDomain = 'kalanaagpur.com';
+      if (domain !== allowedDomain) {
+        return res.status(403).json({ message: "Only kalanaagpur.com domain is available. Other domains coming soon!" });
       }
 
       // Check usage limits
@@ -248,12 +277,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const existingDomains = await storage.getAllDomains();
       if (existingDomains.length === 0) {
-        // Seed default domains
+        // Only kalanaagpur.com for now
         await storage.createDomain({ domain: 'kalanaagpur.com', isPremium: false });
-        await storage.createDomain({ domain: 'b3xmail.com', isPremium: false });
-        await storage.createDomain({ domain: 'premium.b3x.io', isPremium: true });
-        await storage.createDomain({ domain: 'vip.kalanaagpur.com', isPremium: true });
-        console.log("Seeded initial domains");
+        console.log("Seeded kalanaagpur.com domain");
       }
     } catch (error) {
       console.error("Domain seeding error:", error);

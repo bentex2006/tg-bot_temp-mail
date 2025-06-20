@@ -152,20 +152,11 @@ export default function Dashboard() {
   });
 
   const handleCreateEmail = () => {
-    if (!selectedDomain) {
-      toast({
-        title: "Domain Required",
-        description: "Please select a domain for your email address.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     createEmailMutation.mutate({
       telegramId,
       type: emailType,
       customPrefix: emailType === 'permanent' ? customPrefix : undefined,
-      domain: selectedDomain,
+      domain: 'kalanaagpur.com',
     });
   };
 
@@ -389,6 +380,21 @@ export default function Dashboard() {
                       </SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="domain">Email Domain</Label>
+                  <Select value="kalanaagpur.com" disabled>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select domain" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="kalanaagpur.com">kalanaagpur.com</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Other premium domains coming soon for PRO users!
+                  </p>
                 </div>
 
                 {emailType === 'permanent' && (
