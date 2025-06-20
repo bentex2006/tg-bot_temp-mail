@@ -91,18 +91,18 @@ export default function Dashboard() {
     }
   }, []);
 
-  const { data: user, isLoading: userLoading } = useQuery<{ user: User }>({
-    queryKey: ['/api/user', telegramId],
+  const { data: user, isLoading: userLoading, error: userError } = useQuery<{ user: User }>({
+    queryKey: [`/api/user/${telegramId}`],
     enabled: !!telegramId,
   });
 
-  const { data: emailData, isLoading: emailsLoading } = useQuery<EmailData>({
-    queryKey: ['/api/emails', telegramId],
+  const { data: emailData, isLoading: emailsLoading, error: emailsError } = useQuery<EmailData>({
+    queryKey: [`/api/emails/${telegramId}`],
     enabled: !!telegramId,
   });
 
   const { data: domainsData } = useQuery<{ domains: Domain[] }>({
-    queryKey: ['/api/domains', telegramId],
+    queryKey: [`/api/domains/${telegramId}`],
     enabled: !!telegramId,
   });
 
@@ -112,7 +112,7 @@ export default function Dashboard() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/emails', telegramId] });
+      queryClient.invalidateQueries({ queryKey: [`/api/emails/${telegramId}`] });
       setShowCreateDialog(false);
       setCustomPrefix("");
       setSelectedDomain("");
@@ -136,7 +136,7 @@ export default function Dashboard() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/emails', telegramId] });
+      queryClient.invalidateQueries({ queryKey: [`/api/emails/${telegramId}`] });
       toast({
         title: "Email Deleted",
         description: "Email address has been deleted successfully.",
@@ -160,6 +160,7 @@ export default function Dashboard() {
     });
   };
 
+  // Show loading state while checking for telegramId
   if (!telegramId) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -181,17 +182,18 @@ export default function Dashboard() {
               </div>
               <Button 
                 onClick={() => {
-                  if (telegramId) {
-                    localStorage.setItem('telegramId', telegramId);
-                    window.location.reload();
+                  if (telegramId.trim()) {
+                    localStorage.setItem('telegramId', telegramId.trim());
+                    setTelegramId(telegramId.trim());
                   }
                 }}
                 className="w-full"
+                disabled={!telegramId.trim()}
               >
                 Access Dashboard
               </Button>
               <p className="text-sm text-slate-500 text-center">
-                Don't know your ID? Message <a href="https://t.me/akimailb3xbot" className="underline" target="_blank">@akimailb3xbot</a> with /start
+                Don't know your ID? Message <a href="https://t.me/akimailb3xbot" className="underline" target="_blank" rel="noopener noreferrer">@akimailb3xbot</a> with /start
               </p>
             </div>
           </CardContent>
@@ -206,6 +208,7 @@ export default function Dashboard() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-slate-600">Loading your dashboard...</p>
+          <p className="mt-2 text-sm text-slate-400">Telegram ID: {telegramId}</p>
         </div>
       </div>
     );
@@ -234,9 +237,36 @@ export default function Dashboard() {
   const limits = emailData?.limits || { permanent: 2, temporary: 5 };
   const domains = domainsData?.domains || [];
 
-  // Set default domain when domains load
-  if (domains.length > 0 && !selectedDomain) {
-    setSelectedDomain(domains[0].domain);
+  // Show error state if user not found
+  if (userError && !userLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Card className="w-full max-w-md mx-4">
+          <CardHeader>
+            <CardTitle className="text-center text-red-600">User Not Found</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4 text-center">
+              <p className="text-slate-600">
+                No account found with Telegram ID: {telegramId}
+              </p>
+              <p className="text-sm text-slate-500">
+                Please register first or check your Telegram ID
+              </p>
+              <Button 
+                onClick={() => {
+                  localStorage.removeItem('telegramId');
+                  window.location.href = '/';
+                }}
+                className="w-full"
+              >
+                Go to Registration
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   const permanentEmails = emails.filter(e => e.type === 'permanent');
