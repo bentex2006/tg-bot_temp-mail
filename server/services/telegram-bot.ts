@@ -26,12 +26,12 @@ class TelegramBotService {
       const startGif = 'https://i.pinimg.com/originals/a6/85/85/a685853533e35688cbe68853eb085a65.gif';
       
       const welcomeMessage = `
-🤖 Welcome to AKI - KalanaAgpur Mail Service
+🤖 Welcome to AKI - B3X Mail Service
 
 📧 Get temporary and permanent email addresses delivered directly to your Telegram!
 
 🚀 Getting Started:
-1. Register at our website: kalanaagpur.com
+1. Register at our website
 2. Connect your Telegram account
 3. Start receiving emails here!
 
@@ -49,7 +49,7 @@ class TelegramBotService {
 ⭐ PRO Plan Benefits:
 • 20 Permanent emails
 • Unlimited temporary emails
-• Priority support
+• Multiple domain options
 
 Your Telegram ID: ${chatId}
 ${username ? `Username: @${username}` : ''}
@@ -94,14 +94,19 @@ Get started now! 🎉`;
           return this.bot.sendMessage(chatId, `Temporary email limit reached (${maxTemp}/day). Upgrade to PRO for unlimited emails!`);
         }
 
+        // Get available domains for user
+        const availableDomains = await this.storage.getAvailableDomainsForUser(user.isPro);
+        const defaultDomain = availableDomains[0]?.domain || 'kalanaagpur.com';
+
         // Generate temp email
         const prefix = `temp_${Math.random().toString(36).substring(2, 8)}`;
-        const emailAddress = `${prefix}@kalanaagpur.com`;
+        const emailAddress = `${prefix}@${defaultDomain}`;
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
         const email = await this.storage.createEmail({
           userId: user.id,
           email: emailAddress,
+          domain: defaultDomain,
           type: 'temporary',
           expiresAt,
         });
@@ -150,7 +155,7 @@ All emails sent to this address will be forwarded to this chat.`;
         const emails = await this.storage.getUserEmails(user.id);
         
         if (emails.length === 0) {
-          return this.bot.sendMessage(chatId, "You don't have any active emails. Create some at kalanaagpur.com or use /createtemp");
+          return this.bot.sendMessage(chatId, "You don't have any active emails. Create some on our website or use /createtemp");
         }
 
         let message = `📧 Your Active Emails (${emails.length}):\n\n`;
@@ -234,7 +239,7 @@ Contact @skittle_gg for help
 📧 Email Management:
 All emails are forwarded to this chat automatically. Temporary emails expire after 24 hours.
 
-🔗 Website: kalanaagpur.com`;
+🔗 Website: Access through our web portal`;
 
       this.bot.sendMessage(chatId, helpMessage);
     });
@@ -448,7 +453,7 @@ Enter this code on the website to complete your registration.
 ${body}
 
 ---
-Powered by KalanaAgpur Mail`;
+Powered by B3X Mail`;
 
       await this.bot.sendMessage(telegramId, message, {
         parse_mode: 'Markdown'

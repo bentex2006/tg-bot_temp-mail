@@ -100,7 +100,7 @@ export default function Home() {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Mail className="text-white h-4 w-4" />
               </div>
-              <span className="font-bold text-xl text-slate-900">KalanaAgpur Mail</span>
+              <span className="font-bold text-xl text-slate-900">B3X Mail</span>
             </div>
             <div className="hidden md:flex items-center space-x-6">
               <button 
@@ -135,10 +135,10 @@ export default function Home() {
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
               Email Made Simple with<br />
-              <span className="text-sky-200">MessageSquareLock Integration</span>
+              <span className="text-sky-200">Telegram Integration</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-blue-100 leading-relaxed">
-              Get temporary and permanent email addresses delivered directly to your MessageSquareLock. 
+              Get temporary and permanent email addresses delivered directly to your Telegram. 
               No passwords, no complexity - just seamless email management.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -149,7 +149,7 @@ export default function Home() {
                 className="bg-white text-primary hover:bg-slate-100"
               >
                 <MessageSquareLock className="mr-2 h-5 w-5" />
-                Start with MessageSquareLock
+                Start with Telegram
               </Button>
               <Button 
                 variant="ghost" 
@@ -192,10 +192,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-              Why Choose KalanaAgpur Mail?
+              Why Choose B3X Mail?
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Experience email like never before with our MessageSquareLock-first approach
+              Experience email like never before with our Telegram-first approach
             </p>
           </div>
           
