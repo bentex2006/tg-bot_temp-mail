@@ -34,9 +34,10 @@ export function VerificationModal({ open, onOpenChange, telegramId }: Verificati
         title: "Verification Successful!",
         description: "Your account has been activated. Redirecting to dashboard...",
       });
-      // Redirect to dashboard with telegramId
+      // Store telegram ID and redirect to dashboard
+      localStorage.setItem('telegramId', telegramId);
       setTimeout(() => {
-        window.location.href = `/dashboard?telegramId=${telegramId}`;
+        window.location.href = `/dashboard`;
       }, 2000);
     },
     onError: (error: any) => {
@@ -88,7 +89,7 @@ export function VerificationModal({ open, onOpenChange, telegramId }: Verificati
           </div>
           <DialogTitle className="text-2xl">Verify Your MessageSquareLock</DialogTitle>
           <p className="text-slate-600">
-            We've sent a 6-digit code to your MessageSquareLock chat
+            We've sent a 6-digit code to your Telegram chat (@akimailb3xbot)
           </p>
         </DialogHeader>
         
@@ -136,7 +137,7 @@ export function VerificationModal({ open, onOpenChange, telegramId }: Verificati
         <Card className="bg-blue-50 border-blue-200">
           <CardContent className="pt-3 pb-3">
             <p className="text-sm text-blue-700 text-center">
-              Check your MessageSquareLock chat with our bot for the verification code.
+              Check your Telegram chat with @akimailb3xbot for the verification code.
               The code expires in 10 minutes.
             </p>
           </CardContent>

@@ -170,11 +170,11 @@ export default function Dashboard() {
           <CardContent>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="telegramId">Enter your MessageSquareLock ID</Label>
+                <Label htmlFor="telegramId">Enter your Telegram ID</Label>
                 <Input
                   id="telegramId"
                   type="text"
-                  placeholder="Your MessageSquareLock User ID"
+                  placeholder="Your Telegram User ID"
                   value={telegramId}
                   onChange={(e) => setTelegramId(e.target.value)}
                 />

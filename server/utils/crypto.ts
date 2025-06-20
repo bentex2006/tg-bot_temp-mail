@@ -19,7 +19,7 @@ export class CryptoUtils {
   // Encrypt sensitive data
   static encrypt(text: string): { encrypted: string; iv: string; tag: string } {
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipher(ALGORITHM, ENCRYPTION_KEY);
+    const cipher = crypto.createCipherGCM(ALGORITHM, Buffer.from(ENCRYPTION_KEY.slice(0, 32)), iv);
     cipher.setAAD(Buffer.from('additional-auth-data'));
     
     let encrypted = cipher.update(text, 'utf8', 'hex');
@@ -36,7 +36,7 @@ export class CryptoUtils {
 
   // Decrypt sensitive data
   static decrypt(encryptedData: { encrypted: string; iv: string; tag: string }): string {
-    const decipher = crypto.createDecipher(ALGORITHM, ENCRYPTION_KEY);
+    const decipher = crypto.createDecipherGCM(ALGORITHM, Buffer.from(ENCRYPTION_KEY.slice(0, 32)), Buffer.from(encryptedData.iv, 'hex'));
     decipher.setAAD(Buffer.from('additional-auth-data'));
     decipher.setAuthTag(Buffer.from(encryptedData.tag, 'hex'));
     
@@ -60,7 +60,7 @@ export class CryptoUtils {
   static validateInput(input: string): boolean {
     const sqlInjectionPatterns = [
       /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION|SCRIPT)\b)/i,
-      /(--|;|\*|\/\*|\*\/)/,
+      /(\-\-|;|\*|\/\*|\*\/)/,
       /(\b(OR|AND)\s+\d+\s*=\s*\d+)/i,
       /(\b(OR|AND)\s+['"]\w+['"]?\s*=\s*['"]\w+['"]?)/i,
       /(\bUNION\s+(ALL\s+)?SELECT)/i,
@@ -75,7 +75,7 @@ export class CryptoUtils {
     return input
       .replace(/[<>]/g, '') // Remove HTML tags
       .replace(/['"]/g, '') // Remove quotes
-      .replace(/[;--]/g, '') // Remove SQL comment patterns
+      .replace(/[;\-\-]/g, '') // Remove SQL comment patterns
       .trim();
   }
 }

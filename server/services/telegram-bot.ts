@@ -32,7 +32,7 @@ class TelegramBotService {
 
 🚀 Getting Started:
 1. Register at our website
-2. Connect your Telegram account
+2. Connect your Telegram account  
 3. Start receiving emails here!
 
 📱 Available Commands:
@@ -45,11 +45,18 @@ class TelegramBotService {
 • 2 Permanent emails
 • 5 Temporary emails per day
 • 24-hour temp email duration
+• Anti-spam protection
 
 ⭐ PRO Plan Benefits:
 • 20 Permanent emails
 • Unlimited temporary emails
-• Multiple domain options
+• Premium domain access
+• Priority support
+
+🔒 Security Features:
+• Encrypted verification codes
+• Anti-spam protection
+• Secure email forwarding
 
 Your Telegram ID: ${chatId}
 ${username ? `Username: @${username}` : ''}

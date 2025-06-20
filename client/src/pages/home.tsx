@@ -50,7 +50,7 @@ export default function Home() {
       setShowVerification(true);
       toast({
         title: "Registration Successful",
-        description: "Please check your MessageSquareLock for a verification code.",
+        description: "Please check your Telegram (@akimailb3xbot) for a verification code.",
       });
     },
     onError: (error: any) => {

@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { body, validationResult } from "express-validator";
 import { storage } from "./storage";
@@ -41,7 +41,7 @@ const validateRegistration = [
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // User registration
-  app.post("/api/register", validateRegistration, async (req, res) => {
+  app.post("/api/register", validateRegistration, async (req: Request, res: Response) => {
     try {
       // Check validation results
       const errors = validationResult(req);
