@@ -1,4 +1,4 @@
-import { users, emails, usageStats, receivedEmails, type User, type InsertUser, type Email, type InsertEmail, type UsageStats, type InsertUsageStats, type ReceivedEmail, type InsertReceivedEmail } from "@shared/schema";
+import { users, emails, domains, usageStats, receivedEmails, type User, type InsertUser, type Email, type InsertEmail, type Domain, type InsertDomain, type UsageStats, type InsertUsageStats, type ReceivedEmail, type InsertReceivedEmail } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql } from "drizzle-orm";
 
@@ -11,6 +11,11 @@ export interface IStorage {
   updateUser(id: number, updates: Partial<User>): Promise<User | undefined>;
   setUserVerificationCode(telegramId: string, code: string): Promise<void>;
   verifyUser(telegramId: string, code: string): Promise<boolean>;
+  
+  // Domain operations
+  getAllDomains(): Promise<Domain[]>;
+  getAvailableDomainsForUser(isPro: boolean): Promise<Domain[]>;
+  createDomain(domain: InsertDomain): Promise<Domain>;
   
   // Email operations
   createEmail(email: InsertEmail): Promise<Email>;
@@ -86,6 +91,34 @@ export class DatabaseStorage implements IStorage {
       ))
       .returning();
     return !!user;
+  }
+
+  async getAllDomains(): Promise<Domain[]> {
+    return await db
+      .select()
+      .from(domains)
+      .where(eq(domains.isActive, true))
+      .orderBy(domains.domain);
+  }
+
+  async getAvailableDomainsForUser(isPro: boolean): Promise<Domain[]> {
+    if (isPro) {
+      return await this.getAllDomains();
+    } else {
+      return await db
+        .select()
+        .from(domains)
+        .where(and(eq(domains.isActive, true), eq(domains.isPremium, false)))
+        .orderBy(domains.domain);
+    }
+  }
+
+  async createDomain(insertDomain: InsertDomain): Promise<Domain> {
+    const [domain] = await db
+      .insert(domains)
+      .values(insertDomain)
+      .returning();
+    return domain;
   }
 
   async createEmail(insertEmail: InsertEmail): Promise<Email> {

@@ -20,10 +20,19 @@ export const emails = pgTable("emails", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
   email: text("email").notNull().unique(),
+  domain: text("domain").notNull().default("kalanaagpur.com"),
   type: text("type", { enum: ["permanent", "temporary"] }).notNull(),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   expiresAt: timestamp("expires_at"),
+});
+
+export const domains = pgTable("domains", {
+  id: serial("id").primaryKey(),
+  domain: text("domain").notNull().unique(),
+  isPremium: boolean("is_premium").default(false).notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const usageStats = pgTable("usage_stats", {
@@ -55,7 +64,15 @@ export const emailsRelations = relations(emails, ({ one, many }) => ({
     fields: [emails.userId],
     references: [users.id],
   }),
+  domain: one(domains, {
+    fields: [emails.domain],
+    references: [domains.domain],
+  }),
   receivedEmails: many(receivedEmails),
+}));
+
+export const domainsRelations = relations(domains, ({ many }) => ({
+  emails: many(emails),
 }));
 
 export const usageStatsRelations = relations(usageStats, ({ one }) => ({
@@ -82,8 +99,14 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertEmailSchema = createInsertSchema(emails).pick({
   userId: true,
   email: true,
+  domain: true,
   type: true,
   expiresAt: true,
+});
+
+export const insertDomainSchema = createInsertSchema(domains).pick({
+  domain: true,
+  isPremium: true,
 });
 
 export const insertUsageStatsSchema = createInsertSchema(usageStats).pick({
@@ -105,6 +128,8 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertEmail = z.infer<typeof insertEmailSchema>;
 export type Email = typeof emails.$inferSelect;
+export type InsertDomain = z.infer<typeof insertDomainSchema>;
+export type Domain = typeof domains.$inferSelect;
 export type InsertUsageStats = z.infer<typeof insertUsageStatsSchema>;
 export type UsageStats = typeof usageStats.$inferSelect;
 export type InsertReceivedEmail = z.infer<typeof insertReceivedEmailSchema>;

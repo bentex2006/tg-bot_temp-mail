@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertEmailSchema } from "@shared/schema";
+import { insertUserSchema, insertEmailSchema, insertDomainSchema } from "@shared/schema";
 import { z } from "zod";
 import { telegramBot } from "./services/telegram-bot";
 
@@ -89,10 +89,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get available domains
+  app.get("/api/domains/:telegramId", async (req, res) => {
+    try {
+      const { telegramId } = req.params;
+      
+      const user = await storage.getUserByTelegramId(telegramId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const domains = await storage.getAvailableDomainsForUser(user.isPro);
+      res.json({ domains });
+    } catch (error) {
+      console.error("Get domains error:", error);
+      res.status(500).json({ message: "Failed to get domains" });
+    }
+  });
+
   // Create email
   app.post("/api/emails", async (req, res) => {
     try {
-      const { telegramId, type, customPrefix } = req.body;
+      const { telegramId, type, customPrefix, domain } = req.body;
       
       const user = await storage.getUserByTelegramId(telegramId);
       if (!user || !user.isVerified) {
@@ -101,6 +119,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (user.isBanned) {
         return res.status(403).json({ message: "User is banned" });
+      }
+
+      // Validate domain access
+      const availableDomains = await storage.getAvailableDomainsForUser(user.isPro);
+      const selectedDomain = availableDomains.find(d => d.domain === domain);
+      if (!selectedDomain) {
+        return res.status(403).json({ message: "Domain not available for your account type" });
       }
 
       // Check usage limits
@@ -126,12 +151,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate email address
       let emailAddress: string;
       if (type === 'permanent' && customPrefix) {
-        emailAddress = `${customPrefix}@kalanaagpur.com`;
+        emailAddress = `${customPrefix}@${domain}`;
       } else {
         const prefix = type === 'permanent' 
           ? `${user.telegramUsername}_${Date.now()}`
           : `temp_${Math.random().toString(36).substring(2, 8)}`;
-        emailAddress = `${prefix}@kalanaagpur.com`;
+        emailAddress = `${prefix}@${domain}`;
       }
 
       // Check if email already exists
@@ -148,6 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const email = await storage.createEmail({
         userId: user.id,
         email: emailAddress,
+        domain,
         type,
         expiresAt,
       });
