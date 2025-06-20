@@ -191,7 +191,7 @@ export default function Dashboard() {
                 Access Dashboard
               </Button>
               <p className="text-sm text-slate-500 text-center">
-                Don't know your ID? Message <a href="https://t.me/aki_bot" className="underline" target="_blank">@AKI bot</a> with /start
+                Don't know your ID? Message <a href="https://t.me/akimailb3xbot" className="underline" target="_blank">@akimailb3xbot</a> with /start
               </p>
             </div>
           </CardContent>
@@ -259,7 +259,7 @@ export default function Dashboard() {
                 {user.user.isPro ? <><Star className="w-3 h-3 mr-1" /> PRO</> : "FREE"}
               </Badge>
               <Button variant="outline" asChild>
-                <a href="https://t.me/aki_bot" target="_blank" rel="noopener noreferrer">
+                <a href="https://t.me/akimailb3xbot" target="_blank" rel="noopener noreferrer">
                   <MessageSquareLock className="w-4 h-4 mr-2" />
                   Open Bot
                 </a>

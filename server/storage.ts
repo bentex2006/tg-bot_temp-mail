@@ -9,7 +9,7 @@ export interface IStorage {
   getUserByTelegramUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<User | undefined>;
-  setUserVerificationCode(telegramId: string, code: string): Promise<void>;
+  setUserVerificationCode(telegramId: string, hashedCode: string, expiry: Date): Promise<void>;
   verifyUser(telegramId: string, code: string): Promise<boolean>;
   
   // Domain operations
@@ -84,23 +84,58 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
-  async setUserVerificationCode(telegramId: string, code: string): Promise<void> {
+  async setUserVerificationCode(telegramId: string, hashedCode: string, expiry: Date): Promise<void> {
     await db
       .update(users)
-      .set({ verificationCode: code })
+      .set({ 
+        verificationCode: hashedCode,
+        verificationCodeExpiry: expiry 
+      })
       .where(eq(users.telegramId, telegramId));
   }
 
   async verifyUser(telegramId: string, code: string): Promise<boolean> {
+    // First get the user with their verification code and expiry
     const [user] = await db
-      .update(users)
-      .set({ isVerified: true, verificationCode: null })
-      .where(and(
-        eq(users.telegramId, telegramId),
-        eq(users.verificationCode, code)
-      ))
-      .returning();
-    return !!user;
+      .select()
+      .from(users)
+      .where(eq(users.telegramId, telegramId));
+
+    if (!user || !user.verificationCode || !user.verificationCodeExpiry) {
+      return false;
+    }
+
+    // Check if code has expired
+    if (new Date() > user.verificationCodeExpiry) {
+      // Clear expired code
+      await db
+        .update(users)
+        .set({ verificationCode: null, verificationCodeExpiry: null })
+        .where(eq(users.telegramId, telegramId));
+      return false;
+    }
+
+    // Import crypto utils here to avoid circular dependencies
+    const { CryptoUtils } = await import('./utils/crypto');
+    
+    // Verify the code
+    const isValidCode = await CryptoUtils.verifyVerificationCode(code, user.verificationCode);
+    
+    if (isValidCode) {
+      // Update user as verified and clear verification code
+      await db
+        .update(users)
+        .set({ 
+          isVerified: true, 
+          verificationCode: null, 
+          verificationCodeExpiry: null,
+          lastLoginAt: new Date()
+        })
+        .where(eq(users.telegramId, telegramId));
+      return true;
+    }
+
+    return false;
   }
 
   async getAllDomains(): Promise<Domain[]> {

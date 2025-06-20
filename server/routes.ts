@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { body, validationResult } from "express-validator";
 import { storage } from "./storage";
 import { insertUserSchema, insertEmailSchema, insertDomainSchema, users } from "@shared/schema";
 import { db } from "./db";
@@ -7,22 +8,58 @@ import { eq, and, sql } from "drizzle-orm";
 import { z } from "zod";
 import { telegramBot } from "./services/telegram-bot";
 import { emailHandler } from "./services/email-handler";
+import { CryptoUtils } from "./utils/crypto";
 
 const registrationSchema = insertUserSchema.extend({
-  telegramUsername: z.string().min(1).transform(val => val.replace('@', '')),
+  telegramUsername: z.string()
+    .min(1)
+    .max(32)
+    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores")
+    .transform(val => CryptoUtils.sanitizeString(val.replace('@', ''))),
+  fullName: z.string()
+    .min(1)
+    .max(100)
+    .transform(val => CryptoUtils.sanitizeString(val)),
+  telegramId: z.string()
+    .regex(/^\d+$/, "Telegram ID must be numeric")
+    .transform(val => CryptoUtils.sanitizeString(val)),
 });
 
 const emailCreationSchema = insertEmailSchema.omit({ userId: true });
 
 const verificationSchema = z.object({
-  telegramId: z.string(),
-  code: z.string().length(6),
+  telegramId: z.string().regex(/^\d+$/, "Invalid Telegram ID"),
+  code: z.string().length(6).regex(/^\d{6}$/, "Code must be 6 digits"),
 });
+
+// Validation middleware
+const validateRegistration = [
+  body('fullName').isLength({ min: 1, max: 100 }).escape(),
+  body('telegramUsername').isLength({ min: 1, max: 32 }).matches(/^[a-zA-Z0-9_]+$/),
+  body('telegramId').isNumeric(),
+];
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // User registration
-  app.post("/api/register", async (req, res) => {
+  app.post("/api/register", validateRegistration, async (req, res) => {
     try {
+      // Check validation results
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+          message: "Invalid input data", 
+          errors: errors.array() 
+        });
+      }
+
+      // Additional SQL injection validation
+      const { fullName, telegramUsername, telegramId } = req.body;
+      if (!CryptoUtils.validateInput(fullName) || 
+          !CryptoUtils.validateInput(telegramUsername) || 
+          !CryptoUtils.validateInput(telegramId)) {
+        return res.status(400).json({ message: "Invalid characters detected in input" });
+      }
+
       const userData = registrationSchema.parse(req.body);
       const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
       
@@ -53,8 +90,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Generate verification code
-      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      // Generate secure verification code
+      const verificationCode = CryptoUtils.generateVerificationCode();
+      const hashedCode = await CryptoUtils.hashVerificationCode(verificationCode);
+      const codeExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
       
       // Create user with IP tracking
       const userDataWithIp = {
@@ -63,7 +102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const user = await storage.createUser(userDataWithIp);
-      await storage.setUserVerificationCode(userData.telegramId, verificationCode);
+      await storage.setUserVerificationCode(userData.telegramId, hashedCode, codeExpiry);
 
       // Send verification code via Telegram
       await telegramBot.sendVerificationCode(userData.telegramId, verificationCode);
