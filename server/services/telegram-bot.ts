@@ -105,9 +105,9 @@ Get started now! 🎉`;
         const availableDomains = await this.storage.getAvailableDomainsForUser(user.isPro);
         const defaultDomain = availableDomains[0]?.domain || 'kalanaagpur.com';
 
-        // Generate temp email
-        const prefix = `temp_${Math.random().toString(36).substring(2, 8)}`;
-        const emailAddress = `${prefix}@${defaultDomain}`;
+        // Generate temp email with random username
+        const randomUsername = Math.random().toString(36).substring(2, 10);
+        const emailAddress = `${randomUsername}@${defaultDomain}`;
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
         const email = await this.storage.createEmail({

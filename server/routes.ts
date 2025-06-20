@@ -226,7 +226,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         const prefix = type === 'permanent' 
           ? `${user.telegramUsername}_${Date.now()}`
-          : `temp_${Math.random().toString(36).substring(2, 8)}`;
+          : Math.random().toString(36).substring(2, 10);
         emailAddress = `${prefix}@${domain}`;
       }
 
